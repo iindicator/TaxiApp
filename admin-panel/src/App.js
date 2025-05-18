@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../shared/firebase";
+import { db } from "../shared/firebase";
 import { collection, onSnapshot, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { Button } from "@/components/ui/button"; // Assuming you have a UI library - Install:  npm install @radix-ui/react-button
 
-function App() {
+function AdminPanelApp() {
   const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Subscribe to real-time updates of drivers collection
@@ -13,8 +14,8 @@ function App() {
       collection(db, "drivers"),
       (snapshot) => {
         const data = snapshot.docs
-          .filter(doc => doc.data().isApproved === false)
-          .map(doc => ({ id: doc.id, ...doc.data() }));
+          .filter((doc) => doc.data().isApproved === false)
+          .map((doc) => ({ id: doc.id, ...doc.data() }));
         setPending(data);
         setLoading(false);
       },
@@ -27,21 +28,21 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const approveDriver = async (id) => {
+  const approveDriver = async (id: string) => {
     try {
       await updateDoc(doc(db, "drivers", id), { isApproved: true });
       // The onSnapshot listener will auto-update the list
-    } catch (err) {
-      alert("Error approving driver: " + err.message);
+    } catch (err: any) {
+      setError("Error approving driver: " + err.message);
     }
   };
 
-  const rejectDriver = async (id) => {
+  const rejectDriver = async (id: string) => {
     try {
       await deleteDoc(doc(db, "drivers", id));
       // The onSnapshot listener will auto-update the list
-    } catch (err) {
-      alert("Error rejecting driver: " + err.message);
+    } catch (err: any) {
+      setError("Error rejecting driver: " + err.message);
     }
   };
 
@@ -52,7 +53,7 @@ function App() {
     <div style={{ padding: "20px" }}>
       <h2>Admin Panel - Approve or Reject Drivers</h2>
       {pending.length === 0 && <p>No pending drivers for approval.</p>}
-      {pending.map(driver => (
+      {pending.map((driver) => (
         <div
           key={driver.id}
           style={{
@@ -60,25 +61,41 @@ function App() {
             padding: "10px",
             border: "1px solid #ccc",
             borderRadius: "5px",
-            maxWidth: "400px"
+            maxWidth: "400px",
           }}
         >
-          <p><strong>Name:</strong> {driver.name}</p>
-          <p><strong>Phone:</strong> {driver.phone}</p>
-          <p><strong>License:</strong> {driver.license}</p>
-          <p><strong>Car Type:</strong> {driver.carType}</p>
-          <p><strong>Registration Number:</strong> {driver.regNumber}</p>
-          <p><strong>Taxi License:</strong> {driver.taxiLicense}</p>
-          <button onClick={() => approveDriver(driver.id)} style={{ marginRight: "10px" }}>
+          <p>
+            <strong>Name:</strong> {driver.name}
+          </p>
+          <p>
+            <strong>Phone:</strong> {driver.phone}
+          </p>
+          <p>
+            <strong>License:</strong> {driver.license}
+          </p>
+          <p>
+            <strong>Car Type:</strong> {driver.carType}
+          </p>
+          <p>
+            <strong>Registration Number:</strong> {driver.regNumber}
+          </p>
+          <p>
+            <strong>Taxi License:</strong> {driver.taxiLicense}
+          </p>
+           <p>
+            <strong>Bio:</strong> {driver.bio}
+          </p>
+          <Button onClick={() => approveDriver(driver.id)} style={{ marginRight: "10px" }}>
             Approve
-          </button>
-          <button onClick={() => rejectDriver(driver.id)} style={{ backgroundColor: "#f44336", color: "white" }}>
+          </Button>
+          <Button variant="destructive" onClick={() => rejectDriver(driver.id)}>
             Reject
-          </button>
+          </Button>
         </div>
       ))}
     </div>
   );
 }
 
-export default App;
+export default AdminPanelApp;
+

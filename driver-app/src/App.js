@@ -2,7 +2,7 @@
 import React from "react";
 import RegisterDriver from "./RegisterDriver";
 
-function App() {
+function DriverApp() {
   return (
     <div>
       <h2>Driver Registration</h2>
@@ -11,4 +11,4 @@ function App() {
   );
 }
 
-export default App;
+export default DriverApp;
