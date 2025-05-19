@@ -28,16 +28,16 @@ function AdminPanelApp() {
     return () => unsubscribe();
   }, []);
 
-  const approveDriver = async (id: string) => {
+  const approveDriver = async (id) => {
     try {
       await updateDoc(doc(db, "drivers", id), { isApproved: true });
       // The onSnapshot listener will auto-update the list
-    } catch (err: any) {
+    } catch (error) {
       setError("Error approving driver: " + err.message);
     }
   };
 
-  const rejectDriver = async (id: string) => {
+  const rejectDriver = async (id) => {
     try {
       await deleteDoc(doc(db, "drivers", id));
       // The onSnapshot listener will auto-update the list
